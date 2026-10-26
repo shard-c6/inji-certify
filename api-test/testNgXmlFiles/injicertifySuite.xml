@@ -1178,4 +1178,13 @@
 			<class name="io.inji.testrig.apirig.injicertify.testscripts.SimplePost" />
 		</classes>
 	</test>
+	<!-- OpenID Foundation conformance: one TestNG result per conformance module, plus the
+	     benchmark gate. Skipped unless conformanceResultFile or conformanceRunnerDir is set
+	     in config/injiCertify.properties (or as a JVM system property). -->
+	<test name="OpenIDConformance">
+		<classes>
+			<class
+				name="io.inji.testrig.apirig.injicertify.testscripts.OpenIDConformanceTest" />
+		</classes>
+	</test>
 </suite>
