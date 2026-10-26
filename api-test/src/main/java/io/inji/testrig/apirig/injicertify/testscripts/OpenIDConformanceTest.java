@@ -61,6 +61,7 @@ public class OpenIDConformanceTest extends InjiCertifyUtil implements ITest {
 	static final String COMPONENT_KEY = "conformanceComponent";
 	static final String TIMEOUT_KEY = "conformanceRunnerTimeoutMinutes";
 	static final String CERTIFY_API_PATH = "/v1/certify";
+	static final String BASE_URL_KEY = "injiCertifyBaseURL";
 
 	protected String testCaseName = "";
 
@@ -154,9 +155,16 @@ public class OpenIDConformanceTest extends InjiCertifyUtil implements ITest {
 			throw new ConformanceSetupException("Conformance runner not found at " + script.getAbsolutePath(), false);
 		}
 		try {
+			// The testrig's own base URL; empty when its configuration was never loaded (TestNG
+			// started without MosipTestRunner), and the runner must not get a relative URL then.
+			String base = setting(BASE_URL_KEY, "");
+			if (!base.matches("(?i)https?://.+")) {
+				throw new ConformanceSetupException("No absolute " + BASE_URL_KEY + " to run conformance against (got '"
+						+ base + "'); set it in the testrig configuration or as a JVM system property", false);
+			}
 			File output = File.createTempFile("conformance-result-", ".json");
 			output.deleteOnExit();
-			String endpoint = InjiCertifyConfigManager.getInjiCertifyBaseUrl().trim().replaceAll("/+$", "") + CERTIFY_API_PATH;
+			String endpoint = base.replaceAll("/+$", "") + CERTIFY_API_PATH;
 			ProcessBuilder pb = new ProcessBuilder(script.getAbsolutePath(), "--component", "certify", "--endpoint",
 					endpoint, "--no-gate-exit", "--output", output.getAbsolutePath());
 			pb.directory(runnerDir);
